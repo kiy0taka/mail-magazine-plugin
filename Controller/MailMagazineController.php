@@ -16,6 +16,7 @@ use Plugin\MailMagazine\Entity\MailMagazineSendHistory;
 use Plugin\MailMagazine\Entity\MailMagazineTemplate;
 use Plugin\MailMagazine\Service\MailMagazineService;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception as HttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -307,10 +308,10 @@ class MailMagazineController
      */
     public function commit(Application $app, Request $request) {
 
-        // Ajax/POSTでない場合は終了する
-        if (!$request->isXmlHttpRequest() || 'POST' !== $request->getMethod()) {
-            throw new BadRequestHttpException();
-        }
+//        // Ajax/POSTでない場合は終了する
+//        if (!$request->isXmlHttpRequest() || 'POST' !== $request->getMethod()) {
+//            throw new BadRequestHttpException();
+//        }
 
         // タイムアウトしないようにする
         set_time_limit(0);
@@ -328,20 +329,25 @@ class MailMagazineController
         /** @var MailMagazineService $service */
         $service = $this->getMailMagazineService($app);
         /** @var MailMagazineSendHistory $sendHistory */
-        $sendHistory = $service->sendrMailMagazine($id, $offset, $max);
 
-        if ($sendHistory->isComplete()) {
-            $service->sendMailMagazineCompleateReportMail();
-        }
+        $response = new StreamedResponse(function() use ($service, $id, $offset, $max) {
+            $service->sendrMailMagazine($id, $offset, $max, function($count, $total) {
+                echo "event: count".PHP_EOL;
+                echo "data:{ \"count\": ${count}, \"total\": ${total} }".PHP_EOL.PHP_EOL;
+                ob_flush();
+                flush();
+            }, function($count, $total) {
+                echo "event: done".PHP_EOL;
+                echo "data:{ \"count\": ${count}, \"total\": ${total} }".PHP_EOL.PHP_EOL;
+                ob_flush();
+                flush();
+            });
+        });
 
-        log_info('メルマガ配信処理完了', array('id' => $id, 'offset' => $offset, 'max' => $max));
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
 
-        return $app->json(array(
-            'status' => true,
-            'id' => $id,
-            'total' => $sendHistory->getSendCount(),
-            'count' => $sendHistory->getCompleteCount(),
-        ));
+        return $response->send();
     }
 
     /**

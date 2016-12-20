@@ -32,21 +32,24 @@ function changeAction(action) {
     document.form1.submit();
 }
 function sendMail(id, offset, token) {
-    $.post('{{ url('plugin_mail_magazine_commit') }}', { id : id, offset: offset || 0, _token:token })
-        .done(function(res) {
-            $('#send-progress').css('width', (res.count / res.total * 100) + '%');
-            $('#send-status-message').text(res.count + ' / ' + res.total + ' 件処理完了');
-            if (res.count < res.total) {
-                sendMail(id, res.count);
-            } else {
-                $('.modal-title').text('送信完了');
-                $('#send-progress').removeClass('progress-bar-striped active');
-                $('.modal-footer').show();
-            }
-        })
-        .fail(function() {
-            alert('エラーが発生しました。');
-        });
+    offset = offset || 0;
+    var eventSource = new EventSource('{{ url('plugin_mail_magazine_commit') }}?id=' + id + '&offset=' + offset);
+    eventSource.addEventListener('count', function(e) {
+        var res = JSON.parse(e.data);
+        $('#send-progress').css('width', ((offset + res.count) / res.total * 100) + '%');
+        $('#send-status-message').text((offset + res.count) + ' / ' + res.total + ' 件処理完了');
+    });
+    eventSource.addEventListener('done', function(e) {
+        eventSource.close();
+        var res = JSON.parse(e.data);
+        if (offset + res.count < res.total) {
+            sendMail(id, offset + res.count);
+        } else {
+            $('.modal-title').text('送信完了');
+            $('#send-progress').removeClass('progress-bar-striped active');
+            $('.modal-footer').show();
+        }
+    });
 }
 $(function () {
     var lock = false;

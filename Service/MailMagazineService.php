@@ -252,7 +252,7 @@ class MailMagazineService
      * @param int $max 最大数
      * @return MailMagazineSendHistory 送信履歴
      */
-    public function sendrMailMagazine($sendId, $offset = 0, $max = 100)
+    public function sendrMailMagazine($sendId, $offset = 0, $max = 100, $callback = null, $done = null)
     {
         // send_historyを取得する
         /** @var MailMagazineSendHistory $sendHistory */
@@ -332,8 +332,13 @@ class MailMagazineService
             fclose($handleResult);
 
             $processCount++;
+
+            if ($callback) {
+                call_user_func($callback, $processCount, $sendHistory->getSendCount());
+            }
         }
         fclose($handleHistory);
+
 
         // 全部終わったら履歴ファイルを削除
         if ($offset + $processCount >= $sendHistory->getSendCount()) {
@@ -353,6 +358,10 @@ class MailMagazineService
         $sendHistory->setCompleteCount($offset > 0 ? $sendHistory->getCompleteCount() + $processCount : $processCount);
         $sendHistory->setErrorCount($errorCount);
         $this->app[self::REPOSITORY_SEND_HISTORY]->updateSendHistory($sendHistory);
+
+        if ($done) {
+            call_user_func($done, $processCount, $sendHistory->getSendCount());
+        }
 
         return $sendHistory;
     }
