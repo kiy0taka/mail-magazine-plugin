@@ -22,6 +22,17 @@ class PluginManager extends AbstractPluginManager
 
     public function uninstall($config, $app)
     {
+        $mailMagazineDir = str_replace(
+            '${ROOT_DIR}',
+            $app['config']['root_dir'],
+            $app['config']['MailMagazine']['const']['mail_magazine_dir']);
+        if (file_exists($mailMagazineDir)) {
+            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($mailMagazineDir));
+            foreach ($files as $f) {
+                unlink($f->getPathname());
+            }
+            rmdir($mailMagazineDir);
+        }
         $this->migrationSchema($app, __DIR__.'/Resource/doctrine/migration', $config['code'], 0);
     }
 
