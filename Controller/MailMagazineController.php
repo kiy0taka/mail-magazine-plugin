@@ -11,6 +11,8 @@
 
 namespace Plugin\MailMagazine\Controller;
 
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Eccube\Application;
 use Plugin\MailMagazine\Entity\MailMagazineSendHistory;
 use Plugin\MailMagazine\Entity\MailMagazineTemplate;
@@ -210,7 +212,7 @@ class MailMagazineController
         // ------------------------------------------------
         // Subject
         $builder->remove('subject');
-        $builder->add('subject', 'text', array(
+        $builder->add('subject', TextType::class, array(
                 'label' => 'Subject',
                 'required' => true,
                 'constraints' => array(
@@ -220,7 +222,7 @@ class MailMagazineController
 
         // 本文
         $builder->remove('body');
-        $builder->add('body', 'textarea', array(
+        $builder->add('body', TextareaType::class, array(
                 'label' => '本文',
                 'required' => true,
                 'constraints' => array(

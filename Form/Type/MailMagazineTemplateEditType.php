@@ -14,10 +14,12 @@
 
 namespace Plugin\MailMagazine\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class MailMagazineTemplateEditType extends AbstractType
@@ -37,21 +39,21 @@ class MailMagazineTemplateEditType extends AbstractType
         $app = $this->app;
 
         $builder
-            ->add('subject', 'text', array(
+            ->add('subject', TextType::class, array(
                 'label' => '件名',
                 'required' => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
                 ),
             ))
-            ->add('body', 'textarea', array(
+            ->add('body', TextareaType::class, array(
                 'label' => '本文 (テキスト形式)',
                 'required' => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
                 ),
             ))
-            ->add('htmlBody', 'textarea', array(
+            ->add('htmlBody', TextareaType::class, array(
                 'label' => '本文 (HTML形式)',
                 'required' => false,
             ))
@@ -63,7 +65,7 @@ class MailMagazineTemplateEditType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'data_class' => 'Plugin\MailMagazine\Entity\MailMagazineTemplate',
@@ -73,7 +75,7 @@ class MailMagazineTemplateEditType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'mail_magazine_template_edit';
     }

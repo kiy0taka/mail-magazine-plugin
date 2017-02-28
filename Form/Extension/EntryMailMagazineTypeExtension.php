@@ -11,6 +11,7 @@
 
 namespace Plugin\MailMagazine\Form\Extension;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Eccube\Entity\Customer;
 use Plugin\MailMagazine\Entity\MailmagaCustomer;
 use Plugin\MailMagazine\Util\Version;
@@ -44,7 +45,7 @@ class EntryMailMagazineTypeExtension extends AbstractTypeExtension
         }
 
         $builder
-            ->add('mailmaga_flg', 'choice', array(
+            ->add('mailmaga_flg', ChoiceType::class, array(
                 'label' => 'メールマガジン送付について',
                 'choices' => array(
                     '1' => '受け取る',

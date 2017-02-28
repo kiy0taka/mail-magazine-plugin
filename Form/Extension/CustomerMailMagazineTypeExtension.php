@@ -11,6 +11,7 @@
 
 namespace Plugin\MailMagazine\Form\Extension;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Eccube\Entity\Customer;
 use Plugin\MailMagazine\Entity\MailmagaCustomer;
 use Symfony\Component\Form\AbstractTypeExtension;
@@ -59,7 +60,7 @@ class CustomerMailMagazineTypeExtension extends AbstractTypeExtension
             $options['data'] = $mailmagaFlg;
         }
 
-        $builder->add('mailmaga_flg', 'choice', $options);
+        $builder->add('mailmaga_flg', ChoiceType::class, $options);
     }
 
     public function getExtendedType()

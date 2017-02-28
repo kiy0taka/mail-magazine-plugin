@@ -17,7 +17,7 @@ namespace Plugin\MailMagazine\Form\Type;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MailMagazineTemplateType extends AbstractType
 {
@@ -31,16 +31,16 @@ class MailMagazineTemplateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'class' => 'Plugin\MailMagazine\Entity\MailMagazineTemplate',
-            'property' => 'subject',
+            'choice_label' => 'subject',
             'label' => false,
             'multiple' => false,
             'expanded' => false,
             'required' => false,
-            'empty_value' => '-',
+            'placeholder' => '-',
             'query_builder' => function (EntityRepository $er) {
                 return $er->createQueryBuilder('mt')
                     ->orderBy('mt.id', 'ASC');
@@ -51,7 +51,7 @@ class MailMagazineTemplateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'mail_magazine_template';
     }

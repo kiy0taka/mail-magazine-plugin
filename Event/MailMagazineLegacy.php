@@ -2,6 +2,7 @@
 
 namespace Plugin\MailMagazine\Event;
 
+use Eccube\Form\Type\Front\EntryType;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -60,7 +61,7 @@ class MailMagazineLegacy extends CommonEvent
         }
 
         // メルマガFormを取得する
-        $builder = $app['form.factory']->createBuilder('entry');
+        $builder = $app['form.factory']->createBuilder(EntryType::class);
         $form = $builder->getForm();
 
         $form->handleRequest($request);
@@ -122,7 +123,7 @@ class MailMagazineLegacy extends CommonEvent
         $confirmFlg = $this->isEntryConfirm($request);
 
         // メールマガジン送付フラグを取得する
-        $builder = $app['form.factory']->createBuilder('entry');
+        $builder = $app['form.factory']->createBuilder(EntryType::class);
         $form = $builder->getForm();
 
         $form->handleRequest($request);
@@ -261,7 +262,7 @@ class MailMagazineLegacy extends CommonEvent
             }
 
             // Formの取得
-            $builder = $app['form.factory']->createBuilder('entry');
+            $builder = $app['form.factory']->createBuilder(EntryType::class);
             $form = $builder->getForm();
 
             $form->handleRequest($request);
@@ -317,7 +318,7 @@ class MailMagazineLegacy extends CommonEvent
             }
 
             // Formの取得
-            $builder = $app['form.factory']->createBuilder('entry');
+            $builder = $app['form.factory']->createBuilder(EntryType::class);
             $form = $builder->getForm();
 
             if ('POST' === $this->app['request']->getMethod()) {
